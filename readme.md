@@ -12,7 +12,7 @@
 
 [Keycloak][1]
 
-[Swagger][3]
+[Swagger][2]
 
 ## Rotas
 
