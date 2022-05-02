@@ -1,3 +1,6 @@
+from http import client
+import json
+from fastapi.encoders import jsonable_encoder
 from typing import Optional, List
 from urllib import response
 
@@ -26,12 +29,11 @@ class LoginResponse(BaseModel):
     referesh_expires_in: Optional[int]
 
 class User(BaseModel):
-    username: Optional[str]
-    password: Optional[str]
-    email: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-    enable: Optional[bool]
+    username: Optional[str] = ""
+    email: Optional[str] = ""
+    firstName: Optional[str] = ""
+    lastName: Optional[str] = ""
+    enabled: Optional[bool] = True
 
 class UserResponse(BaseModel):
     id: str
@@ -47,13 +49,13 @@ async def read_root():
     return item
 
 @app.post("/login", response_model=LoginResponse)
-async def login(client_id: str = Form(...), username: str = Form(...),
+async def login(client_id: str = Form(...), username: str = Form(...), client_secret: str = Form(...),
                 password: str = Form(...), grant_type: str = Form(...), response: Response = 200):
 
     header = {"Content-Type": "application/x-www-form-urlencoded"}
     
     body = {"client_id": client_id, "username": username,
-        "password": password, "grant_type": grant_type}
+        "password": password, "grant_type": grant_type, "client_secret": client_secret}
 
     try:
         r = requests.post(url=TOKEN_URL, headers=header, data=body,
@@ -65,48 +67,70 @@ async def login(client_id: str = Form(...), username: str = Form(...),
     return response_json
 
 
-@app.post("/users", response_model = UserResponse)
+@app.post("/users", status_code=201)
 async def create_user(authorization: str = Header(None), user: User = str):
-    responde = {"id": "teste1234",
-    "username": "abaco alado"}
-    print(authorization)
-    #TO-DO logica
-    return responde
+
+    data = jsonable_encoder(user)
+
+    header = {"Authorization": authorization, "Content-Type": "application/json"}
+    r = requests.post(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users", headers=header, data=json.dumps(data),
+                        timeout=3)
+    # falta response code se já tiver criado um user
+    return status.HTTP_204_NO_CONTENT
 
 
-@app.get("/users", response_model = List[User])
+@app.get("/users")
 async def get_all_users(authorization: str = Header(None)):
     # To-do logica
-    return [{"username": "Kevin", "enable": True}, {"username": "vitor", "enable": True}]
+    header = {"Authorization": authorization}
+    r = requests.get(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users", headers=header,
+                        timeout=3)
+
+    response_json = r.json()
+
+    return response_json
 
 
-@app.get("/users/{id}", response_model=User)
-async def get_user_by_id(id: int):
-    #To-do logica
-    print(id)
-    return {"username": "vitor", "enable": True}
+@app.get("/users/{id}")
+async def get_user_by_id(id: str, authorization: str = Header(None)):
+    header = {"Authorization": authorization}
+    r = requests.get(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users/" + id, headers=header,
+                        timeout=3)
+
+    response_json = r.json()
+
+    return response_json
 
 
 @app.put("/users/{id}")
-async def update_user(id: int, authorization: str = Header(None), user: User = None):
-    #To-do logica
-    print(id)
-    print(authorization)
-    print(user)
+async def update_user(id: str, authorization: str = Header(None), user: User = None):
+    data = jsonable_encoder(user)
 
-    return {"username": "vitor", "enable": True}
+    header = {"Authorization": authorization, "Content-Type": "application/json"}
+    r = requests.put(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users/" + id, headers=header, data=json.dumps(data),
+                        timeout=3)
+
+    return status.HTTP_204_NO_CONTENT
 
 
 @app.patch("/users/{id}")
-async def update_user_password(id: int, authorization: str = Header(None), user: User = None):
-    #To-do logica
-    print(id)
-    print(authorization)
-    print(user)
-    return {"username": "vitor", "enable": True}
+async def update_user_password(id: str, authorization: str = Header(None), password: dict = {}):
+    
+    data = jsonable_encoder(password)
+    header = {"Authorization": authorization, "Content-Type": "application/json"}
+    r = requests.put(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users/" + id + "/reset-password", headers=header, data=json.dumps(data),
+                        timeout=3)
+
+    return status.HTTP_204_NO_CONTENT
 
 
 @app.delete("/users/{id}")
-async def delete_user(id: int, authorization: str = Header(None)):
+async def delete_user(id: str, authorization: str = Header(None)):
     #To-do logica
+    header = {"Authorization": authorization}
+    r = requests.delete(url= BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users/" + id, headers=header,
+                        timeout=3)
+
+    #response_json = r.json()
+
     return status.HTTP_204_NO_CONTENT
