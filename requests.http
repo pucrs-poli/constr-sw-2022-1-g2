@@ -1,3 +1,88 @@
-@ABC = "Kevin"
+@authToken = {{login.response.body.$.access_token}}
 
-GET http://localhost:8000 HTTP/1.1
+###
+
+# @name login
+POST http://localhost:8000/login HTTP/1.1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="username"
+
+admin
+------WebKitFormBoundary
+Content-Disposition: form-data; name="password"
+
+admin
+------WebKitFormBoundary
+Content-Disposition: form-data; name="client_id"
+
+admin-cli
+------WebKitFormBoundary
+Content-Disposition: form-data; name="grant_type"
+
+password
+------WebKitFormBoundary
+Content-Disposition: form-data; name="client_secret"
+
+n2NzcOuILoILhc3uPrdZanasADtLkOaN
+------WebKitFormBoundary--
+
+###
+
+# @name create_user
+POST http://localhost:8000/users HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+{
+  "username": "kevin",
+  "enabled": true
+}
+
+###
+
+# @name get_all_users
+GET http://localhost:8000/users HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name get_user_by_id
+@id_get = 74ed7b1e-c5c0-4f5b-8a97-a0b48b2c710c
+GET http://localhost:8000/users/{{id_get}} HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+###
+
+# @name update_user
+@id_update = 74ed7b1e-c5c0-4f5b-8a97-a0b48b2c710c
+PUT http://localhost:8000/users/{{id_update}} HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+{
+  "firstName": "carol",
+  "lastName": "joaquina"
+}
+
+
+###
+
+# @name update_user_password
+@id_patch = 74ed7b1e-c5c0-4f5b-8a97-a0b48b2c710c
+PATCH  http://localhost:8000/users/{{id_patch}} HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+{
+  "type": "password",
+  "temporary": false,
+  "value": "a12345678"
+}
+
+###
+
+# @name delete_user
+@id_delete = 18b483c1-77d7-416f-928a-33b072ecfd51
+DELETE   http://localhost:8000/users/{{id_delete}} HTTP/1.1
+Authorization: Bearer {{authToken}}
+
+###
