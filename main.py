@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 from typing import Optional
@@ -8,12 +9,11 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import FastAPI, Response, status, Form, Header
 
 ########### ENVIRONMENT VARS ###########
-#IP = "172.17.0.2"
-IP = "localhost"
-PORT = "8080"
+IP = os.getenv("KEYCLOAK_IP")
+PORT = os.getenv("KEYCLOAK_PORT")
 BASE_KEYCLOAK_URL = "http://" + IP + ":" + PORT
 
-REALM = "master"
+REALM = os.getenv("KEYCLOAK_REALM")
 TOKEN_URL = (
     BASE_KEYCLOAK_URL + "/auth/realms/" + REALM + "/protocol/openid-connect/token"
 )

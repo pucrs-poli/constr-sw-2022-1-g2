@@ -2,6 +2,16 @@
 
 ###
 
+# @name root
+GET http://localhost:8000/ HTTP/1.1
+
+###
+
+# @name docs
+GET http://localhost:8000/docs HTTP/1.1
+
+###
+
 # @name login
 POST http://localhost:8000/login HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
