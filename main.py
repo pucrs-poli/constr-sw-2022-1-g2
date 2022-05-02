@@ -57,12 +57,10 @@ async def login(client_id: str = Form(...), username: str = Form(...), client_se
     body = {"client_id": client_id, "username": username,
         "password": password, "grant_type": grant_type, "client_secret": client_secret}
 
-    try:
-        r = requests.post(url=TOKEN_URL, headers=header, data=body,
-                         timeout=3)
-    except:
-        print("ferrou no login")
-        response.status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    r = requests.post(url=TOKEN_URL, headers=header, data=body,
+                    timeout=3)
+
     response_json = r.json()
     return response_json
 
