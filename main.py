@@ -1,3 +1,4 @@
+from email import header
 import os
 import json
 import requests
@@ -9,15 +10,18 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import FastAPI, Response, status, Form, Header
 
 ########### ENVIRONMENT VARS ###########
-IP = os.getenv("KEYCLOAK_IP")
-PORT = os.getenv("KEYCLOAK_PORT")
+#IP = os.getenv("KEYCLOAK_IP")
+IP = "localhost"
+#PORT = os.getenv("KEYCLOAK_PORT")
+PORT = "8080"
 BASE_KEYCLOAK_URL = "http://" + IP + ":" + PORT
 
-REALM = os.getenv("KEYCLOAK_REALM")
+#REALM = os.getenv("KEYCLOAK_REALM")
+REALM = "master"
 TOKEN_URL = (
     BASE_KEYCLOAK_URL + "/auth/realms/" + REALM + "/protocol/openid-connect/token"
 )
-USERS_URL = BASE_KEYCLOAK_URL + "/auth/admin/realms/master/users"
+USERS_URL = BASE_KEYCLOAK_URL + "/auth/admin/realms/" + REALM + "/users"
 #########################################
 
 
@@ -71,7 +75,10 @@ async def create_user(authorization: str = Header(None), user: User = str):
         timeout=3,
     )
     # falta response code se já tiver criado um user
-    return status.HTTP_204_NO_CONTENT
+
+    #payload = find_by_username(authorization=authorization,username=user.username)
+
+    return status.HTTP_201_CREATED
 
 
 @app.get("/users")
@@ -134,3 +141,29 @@ async def delete_user(id: str, authorization: str = Header(None)):
     header = {"Authorization": authorization}
     r = requests.delete(url=USERS_URL + "/" + id, headers=header, timeout=3)
     return status.HTTP_204_NO_CONTENT
+
+@app.post("/refreshToken")
+async def refresh_token(client_id: str = Form(...),
+    client_secret: str = Form(...),
+    grant_type: str = Form(...),
+    refresh_token: str = Form(...),
+    response: Response = 200):
+    header = {"Content-Type": "application/x-www-form-urlencoded"}
+    body = {
+        "client_id": client_id,
+        "refresh_token": refresh_token,
+        "grant_type": grant_type,
+        "client_secret": client_secret,
+    }
+    r = requests.post(url=TOKEN_URL, headers=header, data=body, timeout=3)
+    response_json = r.json()
+    return response_json
+
+@app.get("/users/{username}")
+async def find_by_username(authorization: str = Header(None), username: str = ""):
+    header = {"Authorization": authorization}
+    username = "vitoria"
+    r = requests.get(url=USERS_URL + "?username=vitoria",
+     headers=header,
+     timeout=3)
+    return r.json()
