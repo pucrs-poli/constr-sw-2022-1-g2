@@ -4,9 +4,15 @@ services:
   keycloak:
     image: jboss/keycloak
     volumes:
+      # No linux o volume já tem que existir senão dá erro, pois ele cria
+      # com as permissões erradas
       - ./keycloak-data:/opt/jboss/keycloak/standalone/data
     ports:
+<<<<<<< HEAD
       - 8082:8080
+=======
+      - 8081:8080
+>>>>>>> 94809d51bcc7c137d26e9d1683e2073326f4a648
     environment:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
@@ -18,5 +24,10 @@ services:
       - 8001:8000
     environment:
       - KEYCLOAK_IP=keycloak
+<<<<<<< HEAD
       - KEYCLOAK_PORT=8082
+=======
+      # a porta do host pode mudar, mas a da rede interna não precisa
+      - KEYCLOAK_PORT=8080
+>>>>>>> 94809d51bcc7c137d26e9d1683e2073326f4a648
       - KEYCLOAK_REALM=master

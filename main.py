@@ -59,7 +59,7 @@ async def login(
         "grant_type": grant_type,
         "client_secret": client_secret,
     }
-    r = requests.post(url=TOKEN_URL, headers=header, data=body, timeout=3)
+    r = requests.post(url=TOKEN_URL, headers=header, data=body)
     response_json = r.json()
     return response_json
 
@@ -72,7 +72,6 @@ async def create_user(authorization: str = Header(None), user: User = str):
         url=USERS_URL,
         headers=header,
         data=json.dumps(data),
-        timeout=3,
     )
     # falta response code se já tiver criado um user
 
@@ -87,7 +86,6 @@ async def get_all_users(authorization: str = Header(None)):
     r = requests.get(
         url=USERS_URL,
         headers=header,
-        timeout=3,
     )
 
     response_json = r.json()
@@ -98,7 +96,7 @@ async def get_all_users(authorization: str = Header(None)):
 @app.get("/users/{id}")
 async def get_user_by_id(id: str, authorization: str = Header(None)):
     header = {"Authorization": authorization}
-    r = requests.get(url=USERS_URL + "/" + id, headers=header, timeout=3)
+    r = requests.get(url=USERS_URL + "/" + id, headers=header)
 
     response_json = r.json()
 
@@ -113,7 +111,6 @@ async def update_user(id: str, authorization: str = Header(None), user: User = N
         url=USERS_URL + "/" + id,
         headers=header,
         data=json.dumps(data),
-        timeout=3,
     )
 
     return status.HTTP_204_NO_CONTENT
@@ -130,7 +127,6 @@ async def update_user_password(
         url=USERS_URL + "/" + id + "/reset-password",
         headers=header,
         data=json.dumps(data),
-        timeout=3,
     )
 
     return status.HTTP_204_NO_CONTENT
@@ -139,7 +135,7 @@ async def update_user_password(
 @app.delete("/users/{id}")
 async def delete_user(id: str, authorization: str = Header(None)):
     header = {"Authorization": authorization}
-    r = requests.delete(url=USERS_URL + "/" + id, headers=header, timeout=3)
+    r = requests.delete(url=USERS_URL + "/" + id, headers=header)
     return status.HTTP_204_NO_CONTENT
 
 @app.post("/refreshToken")

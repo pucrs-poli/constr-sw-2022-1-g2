@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt main.py ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
