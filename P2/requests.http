@@ -1,0 +1,29 @@
+GET http://localhost:8000 HTTP/1.1
+
+###
+
+POST http://localhost:8000/users/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "kevin.fiorentin@edu.pucrs.br",
+  "password": "a12345678"
+}
+
+###
+
+GET http://localhost:8000/users/ HTTP/1.1
+
+###
+POST http://localhost:8000/turmas HTTP/1.1
+Content-Type: application/json
+
+{
+  "ano": "2022",
+  "semestre": "1",
+  "num_turma": "360"
+}
+
+###
+GET http://localhost:8000/turmas HTTP/1.1
+Content-Type: application/json
