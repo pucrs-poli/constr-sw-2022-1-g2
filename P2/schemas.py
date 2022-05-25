@@ -1,43 +1,6 @@
-from pickletools import int4
 from typing import List, Union
-
 from pydantic import BaseModel
 
-
-class ItemBase(BaseModel):
-    title: str
-    description: Union[str, None] = None
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: List[Item] = []
-
-    class Config:
-        orm_mode = True
-
-###############################################################################
 
 class TurmaCreate(BaseModel):
     ano: int
@@ -45,9 +8,44 @@ class TurmaCreate(BaseModel):
     num_turma: int
 
 
-class Turma(TurmaCreate):
+class AlunoCreate(BaseModel):
+    nome: str
+    matricula: str
+
+
+class Aluno(AlunoCreate):
     id: int
 
     class Config:
         orm_mode = True
 
+
+class HorarioCreate(BaseModel):
+    hora: str
+    dia_semana: str
+
+
+class Horario(HorarioCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class Disciplina(BaseModel):
+    pass
+
+
+class Usuario(BaseModel):
+    pass
+
+
+class Turma(TurmaCreate):
+    id: int
+    #alunos: List[Aluno]
+    #horarios: List[Horario]
+    #disciplina: Disciplina
+    #usuario: Usuario
+
+    class Config:
+        orm_mode = True
