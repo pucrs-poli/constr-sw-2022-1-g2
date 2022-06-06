@@ -1,6 +1,7 @@
-from typing import List, Union
 from pydantic import BaseModel
+from typing import Any, List, Optional
 
+from P2.database import Base
 
 class TurmaCreate(BaseModel):
     ano: int
@@ -32,14 +33,6 @@ class Horario(HorarioCreate):
         orm_mode = True
 
 
-class Disciplina(BaseModel):
-    pass
-
-
-class Usuario(BaseModel):
-    pass
-
-
 class Turma(TurmaCreate):
     id: int
     #alunos: List[Aluno]
@@ -49,3 +42,72 @@ class Turma(TurmaCreate):
 
     class Config:
         orm_mode = True
+
+#############################################################
+
+########## STUDENT ##########
+class CreateStudent(BaseModel):
+    name: str
+    enrollment: str
+
+
+class Student(CreateStudent):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+########## SCHEDULE ##########
+class CreateSchedule(BaseModel):
+    hour: str
+    week_day: str
+
+
+class Schedule(CreateSchedule):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+########## CLASS ##########
+class Class(BaseModel):
+    id: Optional[Any]
+    year: int
+    semester: int
+    class_number: int
+
+    id_user: Optional[Any]
+    id_discipline: Optional[Any]
+
+    students: Optional[List[Student]]
+    schedules: Optional[List[Schedule]]
+
+    class Config:
+        orm_mode = True
+
+
+class PatchClass(Base):
+    id: Any
+    year: Optional[int]
+    semester: Optional[int]
+    class_number: Optional[int]
+
+    id_user: Optional[Any]
+    id_discipline: Optional[Any]
+
+    students: Optional[List[Student]]
+    schedules: Optional[List[Schedule]]
+
+class PutClass(Base):
+    id: Any
+    year: int
+    semester: int
+    class_number: int
+
+    id_user: Any
+    id_discipline: Any
+
+    students: List[Student]
+    schedules: List[Schedule] 

@@ -9,13 +9,13 @@ GET http://localhost:8000/docs HTTP/1.1
 GET http://localhost:8000/users/ HTTP/1.1
 
 ###
-POST http://localhost:8000/turmas HTTP/1.1
+POST http://localhost:8000/classes HTTP/1.1
 Content-Type: application/json
 
 {
-  "ano": "2022",
-  "semestre": "1",
-  "num_turma": "31"
+  "year": "2022",
+  "semester": "1",
+  "class_number": "31"
 }
 
 ###

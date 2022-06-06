@@ -75,3 +75,104 @@ def create_horarios(horario: schemas.HorarioCreate, db: Session = Depends(get_db
 def read_horarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     horarios = crud.get_horarios(db, skip=skip, limit=limit)
     return horarios
+
+###############################################################################
+@app.post("/classes", response_model=schemas.Class)
+def create_classes(_class: schemas.Class, db: Session = Depends(get_db)):
+    db_class = crud.get_class_by_id(db, class_id=_class.id)
+    if db_class:
+        raise HTTPException(status_code=400, detail="Class already exists")
+    return crud.create_class(db=db, _class=_class)
+
+######## CLASSES ##########
+@app.post("/classes")
+def create_classes():
+    pass
+
+@app.get("/classes")
+def retrieve_classes():
+    pass
+
+@app.delete("/classes")
+def delete_classes():
+    pass
+
+@app.delete("/classes/{class_id}")
+def delete_class(class_id: str):
+    pass
+
+@app.put("/classes/{class_id}")
+def change_class(class_id: str):
+    pass
+
+@app.patch("/classes/{class_id}")
+def change_class_attribute(class_id: str):
+    pass
+
+######## SCHEDULES ##########
+@app.post("/classes/{class_id}/schedules")
+def create_classes_schedules(class_id: str):
+    pass
+
+@app.get("/classes/{class_id}/schedules")
+def retrieve_classes_schedules(class_id: str):
+    pass
+
+@app.delete("/classes/{class_id}/schedules")
+def delete_class_schedules(class_id: str):
+    pass
+
+@app.delete("/classes/{class_id}/schedules/{schedule_id}")
+def delete_class_schedule(class_id: str, schedule_id: str):
+    pass
+
+@app.put("/classes/{class_id}/schedules/{schedule_id}")
+def change_class_schedule(class_id: str, schedule_id: str):
+    pass
+
+@app.patch("/classes/{class_id}/schedules/{schedule_id}")
+def change_class_schedule_attribute(class_id: str, schedule_id: str):
+    pass
+
+######## STUDENTS ##########
+@app.post("/students")
+def create_students():
+    pass
+
+@app.get("/students")
+def retrieve_students():
+    pass
+
+@app.delete("/students")
+def delete_students():
+    pass
+
+@app.delete("/students/{student_id}")
+def delete_student(student_id: str):
+    pass
+
+@app.put("/students/{student_id}")
+def change_student(student_id: str):
+    pass
+
+@app.patch("/students/{student_id}")
+def change_student_attribute(student_id: str):
+    pass
+
+
+######## CLASS STUDENTS ##########
+@app.post("/classes/{class_id}/students")
+def add_students_to_class(class_id: str):
+    pass
+
+@app.post("/classes/{class_id}/students/{student_id}")
+def add_student_to_class(class_id: str, student_id: str):
+    pass
+
+@app.delete("/classes/{class_id}/students")
+def delete_students_from_class(class_id: str):
+    pass
+
+@app.delete("/classes/{class_id}/students/{student_id}")
+def delete_student_from_class(class_id: str, student_id: str):
+    pass

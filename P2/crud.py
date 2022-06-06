@@ -1,6 +1,11 @@
 from sqlalchemy.orm import Session
 
 from . import models, schemas
+from fastapi.encoders import jsonable_encoder
+from typing import Any
+
+from fastapi_utils.guid_type import GUID
+
 
 def get_turma_by_num_turma(db: Session, num_turma: int):
     return db.query(models.Turma).filter(models.Turma.num_turma == num_turma).first()
@@ -42,3 +47,17 @@ def get_horario_by_dia_semana(db: Session, dia_semana: str):
 
 def get_horarios(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Horario).offset(skip).limit(limit).all()
+
+
+###############################################################################
+
+def get_class_by_id(db: Session, class_id: Any):
+    return db.query(models.Class).filter(models.Class.id == class_id).first()
+
+def create_class(db: Session, _class: schemas.Class):
+    obj_in_data = jsonable_encoder(_class)
+    db_class = models.Class(**obj_in_data)
+    db.add(db_class)
+    db.commit()
+    db.refresh(db_class)
+    return db_class
