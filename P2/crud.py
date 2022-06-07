@@ -5,7 +5,6 @@ from typing import Any
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
 
-
 from fastapi_utils.guid_type import GUID
 
 ########## CLASSES ##########
@@ -82,3 +81,14 @@ def delete_schedule(db: Session, class_id: int, schedule_id: int):
     db.query(models.Schedule).filter_by(id=schedule_id).delete()
     db.commit()
     return status.HTTP_204_NO_CONTENT
+
+########## CLASS STUDENTS ##########
+def set_class_student(db: Session, class_id: int, student_id: int, class_student: schemas.CreateClassStudents):
+    obj_in_data = jsonable_encoder(class_student)
+    db_class_student = models.ClassStudent(**obj_in_data)
+    db.query(models.Class).filter_by(id=class_id)
+    db.add(db_class_student)
+    db.commit()
+    db.refresh(db_class_student)
+    return db_class_student
+    # db.query(models.Class).filter_by(id=class_id).

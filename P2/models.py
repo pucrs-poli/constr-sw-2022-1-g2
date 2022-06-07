@@ -5,14 +5,22 @@ from fastapi_utils.guid_type import GUID
 from sqlalchemy.orm import relationship
 from sqlalchemy import Table, String, Column, Integer, ForeignKey
 
+'''
+class ClassStudent(Base):
+    __tablename__ = "classes_students"
 
-#class Association(Base):
-#    __tablename__ = "association"
-    #class_id = Column(ForeignKey("class.id"), primary_key=True)
-    #student_id = Column(ForeignKey("student.id"), primary_key=True)
-    #extra_data = Column(String(50))
-    #child = relationship("Class", back_populates="class")
-    #parent = relationship("Student", back_populates="student")
+    class_id = Column(ForeignKey("classes.id"), primary_key=True)
+    student_id = Column(ForeignKey("students.id"), primary_key=True)
+
+    _class = relationship("Class", back_populates="students")
+    students = relationship("Student", back_populates="classes")
+'''
+association_table = Table(
+    "association",
+    Base.metadata,
+    Column("classes_id", ForeignKey("classes.id"), primary_key=True),
+    Column("students_id", ForeignKey("students.id"), primary_key=True),
+)
 
 class Class(Base):
     __tablename__ = "classes"
@@ -24,9 +32,13 @@ class Class(Base):
 
     #id_user = Column(Integer, index=True)
     #id_discipline = Column(Integer, index=True)
-    
-    schedules = relationship("Schedule")
-    #students = relationship("Association", back_populates="class")
+
+    schedules = relationship(
+        "Schedule", cascade="all, delete, delete-orphan", passive_deletes=True
+    )
+    students = relationship(
+        "Student", secondary=association_table, back_populates="classes"
+    )
 
 
 class Schedule(Base):
@@ -35,8 +47,8 @@ class Schedule(Base):
     id = Column(Integer, primary_key=True, index=True)
     hour = Column(String, index=True)
     week_day = Column(String, index=True)
-    
-    class_id = Column(Integer, ForeignKey("classes.id"))
+
+    class_id = Column(Integer, ForeignKey("classes.id", ondelete="CASCADE"))
 
 
 class Student(Base):
@@ -45,6 +57,8 @@ class Student(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     enrollment = Column(String, index=True)
-    
-    #classes = relationship("Association", back_populates="student")
+
+    classes = relationship(
+        "Class", secondary=association_table, back_populates="students"
+    )
 

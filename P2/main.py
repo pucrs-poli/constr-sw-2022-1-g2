@@ -119,18 +119,26 @@ def change_student_attribute(student_id: str):
 
 
 ######## CLASS STUDENTS ##########
-@app.post("/classes/{class_id}/students")
-def add_students_to_class(class_id: str):
-    pass
-
 @app.post("/classes/{class_id}/students/{student_id}")
-def add_student_to_class(class_id: str, student_id: str):
-    pass
+def add_student_to_class(class_student: schemas.CreateClassStudents, class_id: str, student_id: str, db: Session = Depends(get_db)):
+    return crud.set_class_student(db, class_id, student_id, class_student)
 
 @app.delete("/classes/{class_id}/students")
 def delete_students_from_class(class_id: str):
     pass
 
 @app.delete("/classes/{class_id}/students/{student_id}")
+def delete_student_from_class(class_id: str, student_id: str):
+    pass
+
+@app.post("/students/{student_id}/classes/{class_id}")
+def add_student_to_class(class_id: str, student_id: str):
+    pass
+
+@app.delete("/students/{student_id}/classes")
+def delete_students_from_class(class_id: str):
+    pass
+
+@app.delete("/students/{student_id}/classes/{class_id}")
 def delete_student_from_class(class_id: str, student_id: str):
     pass
