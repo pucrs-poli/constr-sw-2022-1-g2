@@ -25,13 +25,13 @@ association_table = Table(
 class Class(Base):
     __tablename__ = "classes"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(GUID, primary_key=True, index=True)
     year = Column(Integer, index=True)
     semester = Column(Integer, index=True)
     class_number = Column(Integer, index=True)
 
-    #id_user = Column(Integer, index=True)
-    #id_discipline = Column(Integer, index=True)
+    id_user = Column(GUID, index=True)
+    id_discipline = Column(GUID, index=True)
 
     schedules = relationship(
         "Schedule", cascade="all, delete, delete-orphan", passive_deletes=True
@@ -44,17 +44,17 @@ class Class(Base):
 class Schedule(Base):
     __tablename__ = "schedules"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(GUID, primary_key=True, index=True)
     hour = Column(String, index=True)
     week_day = Column(String, index=True)
 
-    class_id = Column(Integer, ForeignKey("classes.id", ondelete="CASCADE"))
+    class_id = Column(GUID, ForeignKey("classes.id", ondelete="CASCADE"))
 
 
 class Student(Base):
     __tablename__ = "students"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(GUID, primary_key=True, index=True)
     name = Column(String, index=True)
     enrollment = Column(String, index=True)
 

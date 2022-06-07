@@ -2,3 +2,4 @@ env
 __pycache__
 keycloak-data
 sql_app.db
+.vscode
