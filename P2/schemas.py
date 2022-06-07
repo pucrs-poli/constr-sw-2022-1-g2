@@ -1,51 +1,13 @@
 from pydantic import BaseModel
 from typing import Any, List, Optional
 
-from P2.database import Base
 
-class TurmaCreate(BaseModel):
-    ano: int
-    semestre: int
-    num_turma: int
-
-
-class AlunoCreate(BaseModel):
-    nome: str
-    matricula: str
+class CreateClass(BaseModel):
+    year: int
+    semester: int
+    class_number: int
 
 
-class Aluno(AlunoCreate):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class HorarioCreate(BaseModel):
-    hora: str
-    dia_semana: str
-
-
-class Horario(HorarioCreate):
-    id: int
-
-    class Config:
-        orm_mode = True
-
-
-class Turma(TurmaCreate):
-    id: int
-    #alunos: List[Aluno]
-    #horarios: List[Horario]
-    #disciplina: Disciplina
-    #usuario: Usuario
-
-    class Config:
-        orm_mode = True
-
-#############################################################
-
-########## STUDENT ##########
 class CreateStudent(BaseModel):
     name: str
     enrollment: str
@@ -58,10 +20,10 @@ class Student(CreateStudent):
         orm_mode = True
 
 
-########## SCHEDULE ##########
 class CreateSchedule(BaseModel):
     hour: str
     week_day: str
+    class_id: Any
 
 
 class Schedule(CreateSchedule):
@@ -71,8 +33,44 @@ class Schedule(CreateSchedule):
         orm_mode = True
 
 
+class Class(CreateClass):
+    id: int
+    #alunos: List[Aluno]
+    schedules: List[Schedule]
+    #disciplina: Disciplina
+    #usuario: Usuario
+
+    class Config:
+        orm_mode = True
+
+########## STUDENT ##########
+class CreateStudentTMP(BaseModel):
+    name: str
+    enrollment: str
+
+
+class StudentTMP(CreateStudent):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+########## SCHEDULE ##########
+class CreateScheduleTMP(BaseModel):
+    hour: str
+    week_day: str
+
+
+class ScheduleTMP(CreateSchedule):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
 ########## CLASS ##########
-class Class(BaseModel):
+class ClassTmp(BaseModel):
     id: Optional[Any]
     year: int
     semester: int
@@ -88,7 +86,7 @@ class Class(BaseModel):
         orm_mode = True
 
 
-class PatchClass(Base):
+class PatchClass(BaseModel):
     id: Any
     year: Optional[int]
     semester: Optional[int]
@@ -100,7 +98,7 @@ class PatchClass(Base):
     students: Optional[List[Student]]
     schedules: Optional[List[Schedule]]
 
-class PutClass(Base):
+class PutClass(BaseModel):
     id: Any
     year: int
     semester: int

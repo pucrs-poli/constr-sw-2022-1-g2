@@ -4,11 +4,9 @@ GET http://localhost:8000 HTTP/1.1
 
 GET http://localhost:8000/docs HTTP/1.1
 
-###
 
-GET http://localhost:8000/users/ HTTP/1.1
-
-###
+########## CLASSES ##########
+# @name create_class
 POST http://localhost:8000/classes HTTP/1.1
 Content-Type: application/json
 
@@ -19,31 +17,58 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8000/turmas HTTP/1.1
-Content-Type: application/json
+# @name get_all_classes
+GET http://localhost:8000/classes HTTP/1.1
 
 ###
-POST http://localhost:8000/alunos HTTP/1.1
-Content-Type: application/json
-
-{
-  "nome": "Kevin",
-  "matricula": "16204042"
-}
+# @name delete_all_classes
+DELETE http://localhost:8000/classes HTTP/1.1
 
 ###
+# @name delete_class
+DELETE http://localhost:8000/classes/1 HTTP/1.1
 
-GET http://localhost:8000/alunos HTTP/1.1
-
-###
-POST http://localhost:8000/horarios HTTP/1.1
+########## STUDENTS ##########
+# @name create_student
+POST http://localhost:8000/students HTTP/1.1
 Content-Type: application/json
 
 {
-  "hora": "N",
-  "dia_semana": "segunda"
+  "name": "Kevin",
+  "enrollment": "16204042"
 }
 
 ###
+# @name get_all_students
+GET http://localhost:8000/students HTTP/1.1
 
-GET http://localhost:8000/horarios HTTP/1.1
+###
+# @name delete_all_students
+DELETE http://localhost:8000/students HTTP/1.1
+
+###
+# @name delete_student
+DELETE http://localhost:8000/students/1 HTTP/1.1
+
+########## SCHEDULES ##########
+# @name create_schedule
+POST http://localhost:8000/classes/1/schedules HTTP/1.1
+Content-Type: application/json
+
+{
+  "class_id": 1,
+  "hour": "L",
+  "week_day": "MON"
+}
+
+###
+# @name get_all_class_schedules
+GET http://localhost:8000/classes/1/schedules HTTP/1.1
+
+###
+# @name delete_all_class_schedules
+DELETE http://localhost:8000/classes/1/schedules HTTP/1.1
+
+###
+# @name delete_class_schedule
+DELETE http://localhost:8000/classes/1/schedules/1 HTTP/1.1
