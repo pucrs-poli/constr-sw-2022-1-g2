@@ -141,8 +141,8 @@ Content-Type: application/json
 
 {
   "id": "{{schedule_id}}",
-  "hour": "K",
-  "week_day": "THU"
+  "hour": "L",
+  "week_day": "MON"
 }
 
 ###
@@ -160,10 +160,26 @@ Content-Type: application/json
 
 ########## CLASS STUDENTS ##########
 # @name create_class_student
-POST http://localhost:8000/classes/1/students/1 HTTP/1.1
-Content-Type: application/json
+POST http://localhost:8000/classes/{{class_id}}/students/{{student_id}} HTTP/1.1
 
-{
-  "class_id": 1,
-  "student_id": 1
-}
+###
+# @name delete_class_students
+DELETE http://localhost:8000/classes/{{class_id}}/students HTTP/1.1
+
+###
+# @name delete_class_student
+DELETE http://localhost:8000/classes/{{class_id}}/students/{{student_id}} HTTP/1.1
+
+
+
+########## STUDENT CLASSES ##########
+# @name create_class_student
+POST http://localhost:8000/students/{{student_id}}/classes/{{class_id}} HTTP/1.1
+
+###
+# @name delete_student_classes
+DELETE http://localhost:8000/students/{{student_id}}/classes HTTP/1.1
+
+###
+# @name delete_student_class
+DELETE http://localhost:8000/students/{{student_id}}/classes/{{class_id}} HTTP/1.1

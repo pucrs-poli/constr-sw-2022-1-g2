@@ -159,12 +159,7 @@ def delete_class_schedules(class_id: UUID4, db: Session = Depends(get_db)):
     if not _class.schedules:
         raise HTTPException(status_code=400, detail="There isn't schedules for this class")
     
-    schedules = db.query(models.Schedule)\
-        .join(models.Class)\
-        .filter_by(id=class_id)\
-        .all()
-    for schedule in schedules:
-        db.delete(schedule)
+    _class.schedules.clear()
     db.commit()
 
 @app.delete("/classes/{class_id}/schedules/{schedule_id}", status_code=204)
@@ -185,7 +180,7 @@ def delete_class_schedule(class_id: UUID4, schedule_id: UUID4, db: Session = Dep
     if not schedule:
         raise HTTPException(status_code=404, detail="Can't delete because this schedule doesn't exists for this class")
 
-    db.delete(schedule)
+    _class.schedules.remove(schedule)
     db.commit()
 
 @app.put("/classes/{class_id}/schedules/{schedule_id}", status_code=200)
@@ -316,32 +311,90 @@ def change_student_attribute(student_id: UUID4, student: schemas.PatchStudent, d
 
 
 ######## CLASS STUDENTS ##########
-@app.post("/classes/{class_id}/students/{student_id}", status_code=201)
-def add_student_to_class(class_student: schemas.CreateClassStudents, class_id: UUID4, student_id: UUID4, db: Session = Depends(get_db)):
-    obj_in_data = jsonable_encoder(class_student)
-    db_class_student = models.ClassStudent(**obj_in_data)
-    db.query(models.Class).filter_by(id=class_id)
-    db.add(db_class_student)
+@app.post("/classes/{class_id}/students/{student_id}", status_code=200)
+def add_student_to_class(class_id: UUID4, student_id: UUID4, db: Session = Depends(get_db)):
+    _class = db.query(models.Class).filter_by(id=class_id).first()
+    if not _class:
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
+    
+    student = db.query(models.Student).filter_by(id=student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+    
+    if student in _class.students:
+        raise HTTPException(status_code=400, detail="Student already enrolled for this class")
+    
+    _class.students.append(student)
     db.commit()
-    db.refresh(db_class_student)
-    return db_class_student
 
 @app.delete("/classes/{class_id}/students", status_code=204)
-def delete_students_from_class(class_id: UUID4):
-    pass
+def delete_students_from_class(class_id: UUID4, db: Session = Depends(get_db)):
+    _class = db.query(models.Class).filter_by(id=class_id).first()
+    if not _class:
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
+    
+    if not _class.students:
+        raise HTTPException(status_code=400, detail="This class doesn't have students")
+
+    _class.students.clear()
+    db.commit()
 
 @app.delete("/classes/{class_id}/students/{student_id}", status_code=204)
-def delete_student_from_class(class_id: UUID4, student_id: UUID4):
-    pass
+def delete_student_from_class(class_id: UUID4, student_id: UUID4, db: Session = Depends(get_db)):
+    _class = db.query(models.Class).filter_by(id=class_id).first()
+    if not _class:
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
+    
+    student = db.query(models.Student).filter_by(id=student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
+    if not student in _class.students:
+        raise HTTPException(status_code=400, detail="The student isn't enrolled for this class")
+
+    _class.students.remove(student)
+    db.commit()
 
 @app.post("/students/{student_id}/classes/{class_id}", status_code=201)
-def add_student_to_class(class_id: UUID4, student_id: UUID4):
-    pass
+def add_student_to_class(student_id: UUID4, class_id: UUID4, db: Session = Depends(get_db)):
+    student = db.query(models.Student).filter_by(id=student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
+    _class = db.query(models.Class).filter_by(id=class_id).first()
+    if not _class:
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
+    
+    if _class in student.classes:
+        raise HTTPException(status_code=400, detail="Student already enrolled for this class")
+    
+    student.classes.append(_class)
+    db.commit()
 
 @app.delete("/students/{student_id}/classes", status_code=204)
-def delete_students_from_class(class_id: UUID4):
-    pass
+def delete_students_from_class(student_id: UUID4, db: Session = Depends(get_db)):
+    student = db.query(models.Student).filter_by(id=student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+    
+    if not student.classes:
+        raise HTTPException(status_code=400, detail="This students isn't enrolled in any classes")
+
+    student.classes.clear()
+    db.commit()
 
 @app.delete("/students/{student_id}/classes/{class_id}", status_code=204)
-def delete_student_from_class(class_id: UUID4, student_id: UUID4):
-    pass
+def delete_student_from_class(student_id: UUID4, class_id: UUID4, db: Session = Depends(get_db)):
+    student = db.query(models.Student).filter_by(id=student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
+    _class = db.query(models.Class).filter_by(id=class_id).first()
+    if not _class:
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
+
+    if not _class in student.classes:
+        raise HTTPException(status_code=400, detail="The student isn't enrolled for this class")
+
+    student.classes.remove(_class)
+    db.commit()
