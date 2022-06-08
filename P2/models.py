@@ -61,4 +61,3 @@ class Student(Base):
     classes = relationship(
         "Class", secondary=association_table, back_populates="students"
     )
-

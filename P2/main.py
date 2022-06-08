@@ -1,30 +1,23 @@
-from typing import Any, List
 import uuid
+from typing import List
+from pydantic import UUID4
 
-from sqlalchemy.orm import Session
-
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import status, Depends, FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
 
-from pydantic import UUID4
+from sqlalchemy.orm import Session
 
 from . import models, schemas
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
-origins = [
-    "http://localhost", "http://localhost:8080",
-    "http://localhost:3000"
-]
-
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -41,6 +34,7 @@ def get_db():
 async def read_root():
     item = {"Hello": "World"}
     return item
+
 
 
 ######## CLASSES ##########
@@ -89,7 +83,7 @@ def delete_classes(db: Session = Depends(get_db)):
 def delete_class(class_id: UUID4, db: Session = Depends(get_db)):
     tmp_class = db.query(models.Class).filter_by(id=class_id).first()
     if not tmp_class:
-        raise HTTPException(status_code=400, detail="This class doesn't exists")
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
 
     db.query(models.Class).filter_by(id=class_id).delete()
     db.commit()
@@ -98,7 +92,7 @@ def delete_class(class_id: UUID4, db: Session = Depends(get_db)):
 def change_class(class_id: UUID4, _class: schemas.PutClass, db: Session = Depends(get_db)):
     tmp_class = db.query(models.Class).filter_by(id=class_id).first()
     if not tmp_class:
-        raise HTTPException(status_code=400, detail="This class doesn't exists")
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
     
     update_data = jsonable_encoder(_class)
     db.query(models.Class).filter_by(id=class_id).update(update_data)
@@ -108,7 +102,7 @@ def change_class(class_id: UUID4, _class: schemas.PutClass, db: Session = Depend
 def change_class_attribute(class_id: UUID4, _class: schemas.PatchClass, db: Session = Depends(get_db)):
     tmp_class = db.query(models.Class).filter_by(id=class_id).first()
     if not tmp_class:
-        raise HTTPException(status_code=400, detail="This class doesn't exists")
+        raise HTTPException(status_code=404, detail="This class doesn't exists")
     
     update_data = jsonable_encoder(_class)
     tmp = { key:value for key, value in update_data.items() if value }    
@@ -193,7 +187,6 @@ def delete_class_schedule(class_id: UUID4, schedule_id: UUID4, db: Session = Dep
 
     db.delete(schedule)
     db.commit()
-    
 
 @app.put("/classes/{class_id}/schedules/{schedule_id}", status_code=200)
 def change_class_schedule(class_id: UUID4, schedule_id: UUID4, schedule: schemas.PutSchedule, db: Session = Depends(get_db)):
@@ -242,11 +235,20 @@ def change_class_schedule_attribute(class_id: UUID4, schedule_id: UUID4, schedul
         .update(tmp)
     db.commit()
 
+
+
 ######## STUDENTS ##########
 @app.post("/students", response_model=schemas.Student, status_code=201)
 def create_students(student: schemas.PostStudent, db: Session = Depends(get_db)):
+    tmp_student = db.query(models.Student)\
+        .filter_by(name=student.name)\
+        .filter_by(enrollment=student.enrollment)\
+        .first()
+    if tmp_student:
+        raise HTTPException(status_code=400, detail="Student already registered")
+    
     obj_in_data = jsonable_encoder(student)
-    db_student = models.Student(**obj_in_data)
+    db_student = models.Student(**obj_in_data, id=uuid.uuid4())
     db.add(db_student)
     db.commit()
     db.refresh(db_student)
@@ -254,30 +256,62 @@ def create_students(student: schemas.PostStudent, db: Session = Depends(get_db))
 
 @app.get("/students", response_model=List[schemas.Student], status_code=200)
 def retrieve_students(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(models.Student).\
+    students = db.query(models.Student).\
             offset(skip).\
             limit(limit).\
             all()
+    if not students:
+        raise HTTPException(status_code=404, detail="There aren't registered students")
+    
+    return students
 
 @app.delete("/students", status_code=204)
 def delete_students(db: Session = Depends(get_db)):
+    students = db.query(models.Student).\
+            filter().\
+            all()
+    if not students:
+        raise HTTPException(status_code=400, detail="No students to delete")
+
     db.query(models.Student).filter().delete()
     db.commit()
-    return status.HTTP_204_NO_CONTENT
 
 @app.delete("/students/{student_id}", status_code=204)
 def delete_student(student_id: UUID4, db: Session = Depends(get_db)):
+    student = db.query(models.Student)\
+            .filter_by(id=student_id)\
+            .first()
+    if not student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
     db.query(models.Student).filter_by(id=student_id).delete()
     db.commit()
-    return status.HTTP_204_NO_CONTENT
 
 @app.put("/students/{student_id}", status_code=200)
 def change_student(student_id: UUID4, student: schemas.PutStudent, db: Session = Depends(get_db)):
-    pass
+    tmp_student = db.query(models.Student)\
+            .filter_by(id=student_id)\
+            .first()
+    if not tmp_student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
+    update_data = jsonable_encoder(student)
+    db.query(models.Student).filter_by(id=student_id).update(update_data)
+    db.commit()
 
 @app.patch("/students/{student_id}", status_code=200)
 def change_student_attribute(student_id: UUID4, student: schemas.PatchStudent, db: Session = Depends(get_db)):
-    pass
+    tmp_student = db.query(models.Student)\
+            .filter_by(id=student_id)\
+            .first()
+    if not tmp_student:
+        raise HTTPException(status_code=404, detail="This student doesn't exists")
+
+    update_data = jsonable_encoder(student)
+    tmp = { key:value for key, value in update_data.items() if value }
+    print(tmp)    
+    db.query(models.Student).filter_by(id=student_id).update(tmp)
+    db.commit()
 
 
 
