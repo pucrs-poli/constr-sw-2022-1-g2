@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 from typing import Any, List, Optional
 
 ########## CLASSES ##########
@@ -9,34 +9,34 @@ class PostClass(BaseModel):
     class_number: int
 
 class PutClass(PostClass):
-    id: Any
+    id: UUID4
     
-    students: List[Any]
-    schedules: List[Any]
-    
-    user_id: Any
-    discipline_id: Any
+    #students: List[Any]
+    #schedules: List[Any]
+
+    id_user: UUID4
+    id_discipline: UUID4
 
 class PatchClass(BaseModel):
-    id: Any
+    id: UUID4
     year: Optional[int]
     semester: Optional[int]
     class_number: Optional[int]
-    
-    students: Optional[List[Any]]
-    schedules: Optional[List[Any]]
 
-    user_id: Optional[Any]
-    discipline_id: Optional[Any]
+    #students: Optional[List[Any]]
+    #schedules: Optional[List[Any]]
+
+    id_user: Optional[UUID4]
+    id_discipline: Optional[UUID4]
 
 class Class(PostClass):
-    id: Any
+    id: UUID4
 
     students: List[Any]
     schedules: List[Any]
     
-    user_id: Any
-    discipline_id: Any
+    id_user: Any
+    id_discipline: Any
 
     class Config:
         orm_mode = True
@@ -47,22 +47,22 @@ class PostStudent(BaseModel):
     enrollment: str
 
 class PutStudent(PostStudent):
-    id: Any
+    id: UUID4
     
     name: str
     enrollment: str
     
-    classes: List[Any]
+    #classes: List[Any]
 
 class PatchStudent(BaseModel):
-    id: Any
+    id: UUID4
     name: Optional[str]
     enrollment: Optional[str]
     
-    classes: Optional[List[Any]]
+    #classes: Optional[List[Any]]
 
 class Student(PostStudent):
-    id: Any
+    id: UUID4
     classes: List[Any]
 
     class Config:
@@ -73,27 +73,29 @@ class PostSchedule(BaseModel):
     hour: str
     week_day: str
     
-    class_id: Any
+    class_id: UUID4
 
-class PutSchedule(PostSchedule):
-    id: Any
+class PutSchedule(BaseModel):
+    id: UUID4
+    hour: str
+    week_day: str
 
-    class_id: Any
+    #class_id: UUID4
 
 class PatchSchedule(BaseModel):
-    id: Any
+    id: UUID4
     hour: Optional[str]
     week_day: Optional[str]
     
-    class_id: Optional[Any]
+    #class_id: Optional[UUID4]
 
 class Schedule(PostSchedule):
-    id: Any
+    id: UUID4
 
     class Config:
         orm_mode = True
 
 ########## CLASS STUDENTS ##########
 class CreateClassStudents(BaseModel):
-    class_id: Any
-    student_id: Any
+    class_id: UUID4
+    student_id: UUID4
