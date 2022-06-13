@@ -8,65 +8,67 @@ class PostClass(BaseModel):
     semester: int
     class_number: int
 
+    id_user: Optional[UUID4]
+    id_discipline: Optional[UUID4]
+
+    students: Optional[List[Any]] = []
+    schedules: Optional[List[Any]] = []
+
 class PutClass(PostClass):
-    id: UUID4
+    class_id: UUID4
+    
+    id_user: UUID4
+    id_discipline: UUID4
     
     #students: List[Any]
     #schedules: List[Any]
 
-    id_user: UUID4
-    id_discipline: UUID4
-
-class PatchClass(BaseModel):
-    id: UUID4
+class PatchClass(PutClass):
     year: Optional[int]
     semester: Optional[int]
     class_number: Optional[int]
-
-    #students: Optional[List[Any]]
-    #schedules: Optional[List[Any]]
-
+    
     id_user: Optional[UUID4]
     id_discipline: Optional[UUID4]
 
-class Class(PostClass):
-    id: UUID4
+    #students: Optional[List[Any]] = []
+    #schedules: Optional[List[Any]] = []
 
-    students: List[Any]
-    schedules: List[Any]
+class Class(PatchClass):
+    students: Optional[List[Any]] = []
+    schedules: Optional[List[Any]] = []
     
-    id_user: Any
-    id_discipline: Any
-
     class Config:
         orm_mode = True
+
 
 ########## STUDENTS ##########
 class PostStudent(BaseModel):
     name: str
     enrollment: str
 
+    classes: Optional[List[Any]]
+
 class PutStudent(PostStudent):
-    id: UUID4
+    student_id: UUID4
     
     name: str
     enrollment: str
     
     #classes: List[Any]
 
-class PatchStudent(BaseModel):
-    id: UUID4
+class PatchStudent(PutStudent):
     name: Optional[str]
     enrollment: Optional[str]
     
     #classes: Optional[List[Any]]
 
-class Student(PostStudent):
-    id: UUID4
-    classes: List[Any]
+class Student(PatchStudent):
+    classes: Optional[List[Any]]
 
     class Config:
         orm_mode = True
+
 
 ########## SCHEDULES ##########
 class PostSchedule(BaseModel):
@@ -75,23 +77,16 @@ class PostSchedule(BaseModel):
     
     class_id: UUID4
 
-class PutSchedule(BaseModel):
-    id: UUID4
-    hour: str
-    week_day: str
+class PutSchedule(PostSchedule):
+    schedule_id: UUID4
 
-    #class_id: UUID4
-
-class PatchSchedule(BaseModel):
-    id: UUID4
+class PatchSchedule(PutSchedule):
     hour: Optional[str]
     week_day: Optional[str]
     
-    #class_id: Optional[UUID4]
+    class_id: Optional[UUID4]
 
-class Schedule(PostSchedule):
-    id: UUID4
-
+class Schedule(PatchSchedule):
     class Config:
         orm_mode = True
 

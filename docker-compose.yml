@@ -1,0 +1,22 @@
+version: '3.9'
+# api url -> localhost:8000 ou api:8000 se dentro do container
+# swagger -> cm a api rodando localhost:8000/docs
+services:
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=1234
+
+  api:
+    depends_on:
+      - db
+    build: ./P2
+    ports:
+      - 8000:8000
+    environment:
+      - DB_HOST=localhost:5432
+      - DB_USER=admin
+      - DB_PASSWORD=1234

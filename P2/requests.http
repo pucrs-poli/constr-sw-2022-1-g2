@@ -1,9 +1,7 @@
-@class_id = {{get_all_classes.response.body.$.[0].id}}
-@student_id = {{get_all_students.response.body.$.[0].id}}
-@schedule_id = {{get_all_class_schedules.response.body.$.[0].id}}
+@class_id = {{get_all_classes.response.body.$.[0].class_id}}
+@student_id = {{get_all_students.response.body.$.[0].student_id}}
+@schedule_id = {{get_all_class_schedules.response.body.$.[0].schedule_id}}
 
-# How to PUT an object with reference to other objects?
-# How to DELETE an object and the objects that are bound to it?
 
 ###
 GET http://localhost:8000 HTTP/1.1
@@ -20,14 +18,26 @@ POST http://localhost:8000/classes HTTP/1.1
 Content-Type: application/json
 
 {
-  "year": "2021",
+  "year": "2022",
   "semester": "2",
-  "class_number": "31"
+  "class_number": "33",
+  "schedules": [{
+    "hour": "L",
+    "week_day": "TUE"
+  }],
+  "students": [{
+    "name": "Kevin",
+    "enrollment": "16204042"
+  }]
 }
 
 ###
 # @name get_all_classes
 GET http://localhost:8000/classes HTTP/1.1
+
+###
+# @name get_class
+GET http://localhost:8000/classes/{{class_id}} HTTP/1.1
 
 ###
 # @name delete_all_classes
@@ -43,12 +53,25 @@ PUT http://localhost:8000/classes/{{class_id}} HTTP/1.1
 Content-Type: application/json
 
 {
-  "year": 2021,
+  "class_id": "{{class_id}}",
+  "year": 2022,
   "semester": 2,
-  "class_number": 32,
-  "id": "{{class_id}}",
+  "class_number": 34,
   "id_user": "bc14492a-7810-46c6-9a21-28c312413771",
-  "id_discipline": "bc14492a-7810-46c6-9a21-28c312413771"
+  "id_discipline": "bc14492a-7810-46c6-9a21-28c312413771",
+  "schedules": [{
+    "hour": "L",
+    "week_day": "MON",
+    "schedule_id": "{{schedule_id}}",
+    "class_id": "{{class_id}}"
+  }],
+  "students": [
+    {
+      "enrollment": "16204043",
+      "student_id": "{{student_id}}",
+      "name": "Jubis"
+    }
+  ]
 }
 
 
@@ -72,13 +95,18 @@ POST http://localhost:8000/students HTTP/1.1
 Content-Type: application/json
 
 {
-  "name": "Kevin",
-  "enrollment": "16204042"
+  "name": "Jubis",
+  "enrollment": "16204043"
 }
 
 ###
 # @name get_all_students
 GET http://localhost:8000/students HTTP/1.1
+
+###
+# @name get_student
+GET http://localhost:8000/students/{{student_id}} HTTP/1.1
+
 
 ###
 # @name delete_all_students
@@ -118,13 +146,17 @@ Content-Type: application/json
 
 {
   "class_id": "{{class_id}}",
-  "hour": "M",
+  "hour": "L",
   "week_day": "MON"
 }
 
 ###
 # @name get_all_class_schedules
 GET http://localhost:8000/classes/{{class_id}}/schedules HTTP/1.1
+
+###
+# @name get_class_schedule
+GET http://localhost:8000/classes/{{class_id}}/schedules/{{schedule_id}} HTTP/1.1
 
 ###
 # @name delete_all_class_schedules
@@ -140,9 +172,10 @@ PUT http://localhost:8000/classes/{{class_id}}/schedules/{{schedule_id}} HTTP/1.
 Content-Type: application/json
 
 {
-  "id": "{{schedule_id}}",
-  "hour": "L",
-  "week_day": "MON"
+  "schedule_id": "{{schedule_id}}",
+  "hour": "K",
+  "week_day": "MON",
+  "class_id": "{{class_id}}"
 }
 
 ###
@@ -151,9 +184,10 @@ PATCH http://localhost:8000/classes/{{class_id}}/schedules/{{schedule_id}} HTTP/
 Content-Type: application/json
 
 {
-  "id": "{{schedule_id}}",
+  "schedule_id": "{{schedule_id}}",
   "hour": "J",
-  "week_day": "WED"
+  "week_day": "WED",
+  "class_id": "{{class_id}}"
 }
 
 
